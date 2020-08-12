@@ -36,10 +36,9 @@ const formSubmit = (e) => {
     .post(`https://reqres.in/api/users`, formState)
     .then((res) => {
         console.log('Request Successful', res.data)
-        // setUsers({
-        //     ...users,
-
-        // })
+        setUsers(
+            console.log(JSON.stringify({res})) // Not exactly diaplying on screen, but it's pulling back the data I submit
+        )
         setServerError(null)
         setFormState({
             name: "",

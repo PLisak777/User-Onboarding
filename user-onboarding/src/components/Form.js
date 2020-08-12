@@ -11,8 +11,16 @@ const [formState, setFormState] = useState({ // setting initial state to wait fo
     terms: true
 });
 
-// Watch for Server Error
+// Set state for Server Error
 const [serverError, setServerError] = useState("");
+
+// Manage state for errors
+const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    password: "",
+    terms: ""
+})
 
 // Set submit button disabled until all validation has completed
 const [buttonDisabled, setButtonDisabled] = useState(true);
@@ -21,10 +29,46 @@ const [buttonDisabled, setButtonDisabled] = useState(true);
 const formSubmit = (e) => {
     e.preventDefault();
     console.log('Submitted')
+    axios
+    .post(`https://reqres.in/api/users`, formState)
+    .then((res) => {
+        console.log('Request Successful', res.data)
+        // setPost(res.data)
+        setServerError(null)
+        setFormState({
+            name: "",
+            email: "",
+            password: "",
+            terms: true
+        })
+    })
+    .catch((err) => {
+        setServerError('Your Request Has Failed')
+    })
 }
 
 // onChange function goes here
 
+
+// Inline validation handling
+const changeValidation = (e) => {
+    yup
+    .reach(formSchema, e.target.name) // goes inside schema to get rules
+    .validate(e.target.name === 'terms' ? e.target.checked : e.target.value)
+    .then((valid) => {
+        setErrors({ // will set the error to display error shown in schema
+            ...errors, 
+            [e.target.name]: ""
+        })
+    })
+    .catch((err) => {
+        console.log(err);
+        setErrors({
+            ...errors,
+            [e.target.name] : err.errors[0] // each error is the first item in its list
+        })
+    })
+}
 
 // Create form schema to tell yup what to validate
 const formSchema = yup.object().shape({
@@ -58,7 +102,7 @@ return (
         id='name'
         type='text'
         name='name'
-          //   value={formState.name}
+        // value={formState.name}
           //   onChange={inputChange}
         />
     </label>
@@ -68,7 +112,7 @@ return (
         id='email'
         type='text'
         name='email'
-          //   value={formState.email}
+        // value={formState.email}
           //   onChange={inputChange}
         />
     </label>
@@ -78,7 +122,7 @@ return (
         id='password'
         type='password'
         name='password'
-          //   value={formState.name}
+        // value={formState.password}
           //   onChange={inputChange}
         />
     </label>
@@ -88,7 +132,7 @@ return (
         id='terms'
         type='checkbox'
         name='terms'
-          //   checked={formState.terms}
+        // checked={formState.terms}
           //   onChange={inputChange}
         />
     </label>

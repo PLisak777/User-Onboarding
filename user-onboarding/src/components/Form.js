@@ -22,6 +22,9 @@ const [errors, setErrors] = useState({
     terms: ""
 })
 
+// Create list of users
+const [users, setUsers] = useState([]);
+
 // Set submit button disabled until all validation has completed
 const [buttonDisabled, setButtonDisabled] = useState(true);
 
@@ -33,7 +36,10 @@ const formSubmit = (e) => {
     .post(`https://reqres.in/api/users`, formState)
     .then((res) => {
         console.log('Request Successful', res.data)
-        // setPost(res.data)
+        // setUsers({
+        //     ...users,
+
+        // })
         setServerError(null)
         setFormState({
             name: "",
@@ -48,7 +54,15 @@ const formSubmit = (e) => {
 }
 
 // onChange function goes here
-
+const inputChange = (e) => {
+    e.persist(); // Has something to do with async code, should get clarification...
+    const newFormData = {
+        ...formState,
+        [e.target.name]: e.target.type === 'checkbox' ? e.target.checked : e.target.value
+    }
+    changeValidation(e);
+    setFormState(newFormData);
+}
 
 // Inline validation handling
 const changeValidation = (e) => {
@@ -95,15 +109,17 @@ useEffect(() => {
 }, [formState])
 
 return (
-    <form>
+    <form onSubmit={formSubmit}>
+{serverError ? <p className='error'>{serverError}</p>: null}
+
     <label htmlFor='name'>
         Name
         <input
         id='name'
         type='text'
         name='name'
-        // value={formState.name}
-          //   onChange={inputChange}
+        value={formState.name}
+        onChange={inputChange}
         />
     </label>
     <label htmlFor='email'>
@@ -112,8 +128,8 @@ return (
         id='email'
         type='text'
         name='email'
-        // value={formState.email}
-          //   onChange={inputChange}
+        value={formState.email}
+        onChange={inputChange}
         />
     </label>
     <label htmlFor='password'>
@@ -122,8 +138,8 @@ return (
         id='password'
         type='password'
         name='password'
-        // value={formState.password}
-          //   onChange={inputChange}
+        value={formState.password}
+        onChange={inputChange}
         />
     </label>
     <label htmlFor='name'>
@@ -132,8 +148,8 @@ return (
         id='terms'
         type='checkbox'
         name='terms'
-        // checked={formState.terms}
-          //   onChange={inputChange}
+        checked={formState.terms}
+        onChange={inputChange}
         />
     </label>
     <button disabled={buttonDisabled} type='submit'>Submit</button>

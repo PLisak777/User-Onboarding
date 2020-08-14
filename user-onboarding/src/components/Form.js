@@ -2,6 +2,22 @@ import React, { useState, useEffect } from 'react';
 import * as yup from 'yup';
 import axios from 'axios';
 
+const formSchema = yup.object().shape({
+    name: yup
+    .string()
+    .required("Name is a required field"),
+    email: yup
+    .string()
+    .email("Must be a valid email")
+    .required("Email is a required field"),
+    password: yup
+    .string()
+    .required("Password is required"),
+    terms: yup
+    .boolean()
+    .oneOf([true], "Please agree to Terms & Conditions before continuing")
+})
+
 const Form = () => {
     // Setting up state for the form
 const [formState, setFormState] = useState({ // setting initial state to wait for user input
@@ -26,6 +42,14 @@ const [post, setPost] = useState([]);
 
 // Set submit button disabled until all validation has completed
 const [buttonDisabled, setButtonDisabled] = useState(true);
+
+
+//Validate entire form when input changes
+useEffect(() => {
+    formSchema.isValid(formState).then((valid) => {
+        setButtonDisabled(!valid)
+    })
+}, [formState])
 
 // onSubmit function goes here
 const formSubmit = (e) => {
@@ -79,30 +103,6 @@ const changeValidation = (e) => {
         })
     })
 }
-
-// Create form schema to tell yup what to validate
-const formSchema = yup.object().shape({
-    name: yup
-    .string()
-    .required("Name is a required field"),
-    email: yup
-    .string()
-    .email("Must be a valid email")
-    .required("Email is a required field"),
-    password: yup
-    .string()
-    .required("Password is required"),
-    terms: yup
-    .boolean()
-    .oneOf([true], "Please agree to Terms & Conditions before continuing")
-})
-
-//Validate entire form when input changes
-useEffect(() => {
-    formSchema.isValid(formState).then((valid) => {
-        setButtonDisabled(!valid)
-    })
-}, [formState])
 
 return (
     <form onSubmit={formSubmit}>

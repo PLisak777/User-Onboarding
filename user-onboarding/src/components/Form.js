@@ -22,8 +22,7 @@ const [errors, setErrors] = useState({
     terms: ""
 })
 
-// Create list of users
-const [users, setUsers] = useState([]);
+const [post, setPost] = useState([]);
 
 // Set submit button disabled until all validation has completed
 const [buttonDisabled, setButtonDisabled] = useState(true);
@@ -35,10 +34,8 @@ const formSubmit = (e) => {
     axios
     .post(`https://reqres.in/api/users`, formState)
     .then((res) => {
+        setPost(res.data)
         console.log('Request Successful', res.data)
-        setUsers(
-            console.log(JSON.stringify({res})) // Not exactly diaplying on screen, but it's pulling back the data I submit
-        )
         setServerError(null)
         setFormState({
             name: "",
@@ -102,8 +99,8 @@ const formSchema = yup.object().shape({
 
 //Validate entire form when input changes
 useEffect(() => {
-    formSchema.isValid(formState).then((isValid) => {
-        setButtonDisabled(!isValid)
+    formSchema.isValid(formState).then((valid) => {
+        setButtonDisabled(!valid)
     })
 }, [formState])
 
@@ -117,9 +114,11 @@ return (
         id='name'
         type='text'
         name='name'
+        data-cy='name'
         value={formState.name}
         onChange={inputChange}
         />
+        {errors.name.length > 0 ? <p className='error'>{errors.name}</p>: null}
     </label>
     <label htmlFor='email'>
         Email
@@ -127,9 +126,11 @@ return (
         id='email'
         type='text'
         name='email'
+        data-cy='email'
         value={formState.email}
         onChange={inputChange}
         />
+        {errors.email.length > 0 ? <p className='error'>{errors.email}</p>: null}
     </label>
     <label htmlFor='password'>
         Password
@@ -137,9 +138,11 @@ return (
         id='password'
         type='password'
         name='password'
+        data-cy='password'
         value={formState.password}
         onChange={inputChange}
         />
+        {errors.password.length > 0 ? <p className='error'>{errors.password}</p>: null}
     </label>
     <label htmlFor='name'>
         Terms & Conditions
@@ -147,11 +150,14 @@ return (
         id='terms'
         type='checkbox'
         name='terms'
+        data-cy='terms'
         checked={formState.terms}
         onChange={inputChange}
         />
     </label>
-    <button disabled={buttonDisabled} type='submit'>Submit</button>
+    {/* Display data for each user */}
+    <pre>{JSON.stringify(post, null, 2)}</pre>
+    <button data-cy='submit' disabled={buttonDisabled} type='submit'>Submit</button>
     </form>
 );
 };
